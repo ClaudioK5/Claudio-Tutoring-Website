@@ -58,10 +58,9 @@ export const PRICING_PACKAGES = [
  */
 export const BOOKING_URL = "https://calendar.app.google/MKYm8xV3Ve7PkZWJ6";
 
-/** Video di presentazione (YouTube) — non caricare mp4 nel repo */
+/** Video di presentazione — hostato su Cloudflare R2 (niente mp4 nel repo) */
 export const INTRO_VIDEO = {
-  youtubeId: "Frio8iyitb4",
-  url: "https://youtu.be/Frio8iyitb4",
+  src: "https://pub-bf0c83966aed4c87b2a3c71920dd4931.r2.dev/0829%282%29.mp4",
   poster: "/images/video-poster.png",
 } as const;
 
