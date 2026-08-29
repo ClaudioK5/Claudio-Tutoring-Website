@@ -60,7 +60,7 @@ export const BOOKING_URL = "https://calendar.app.google/MKYm8xV3Ve7PkZWJ6";
 
 /** Video di presentazione — hostato su Cloudflare R2 (niente mp4 nel repo) */
 export const INTRO_VIDEO = {
-  src: "https://pub-bf0c83966aed4c87b2a3c71920dd4931.r2.dev/0829%282%29.mp4",
+  src: "https://pub-bf0c83966aed4c87b2a3c71920dd4931.r2.dev/0829%282%29%20%281%29.mp4",
   poster: "/images/video-poster.png",
 } as const;
 
