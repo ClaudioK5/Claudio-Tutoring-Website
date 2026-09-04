@@ -16,7 +16,7 @@ export const SITE = {
 
 export const PRICING = {
   currency: "€",
-  amount: 17,
+  amount: 25,
   unit: "ora",
   label: "A partire da",
 } as const;
@@ -25,7 +25,7 @@ export const PRICING_PACKAGES = [
   {
     id: "single",
     name: "Lezione singola",
-    priceLabel: "€19",
+    priceLabel: "€25",
     priceSuffix: "/ ora",
     detail: null as string | null,
     description: "Per dubbi, singoli argomenti o una lezione occasionale.",
@@ -34,18 +34,18 @@ export const PRICING_PACKAGES = [
   {
     id: "pack-5",
     name: "Pacchetto 5 ore",
-    priceLabel: "€90",
+    priceLabel: "€110",
     priceSuffix: " totali",
-    detail: "€18 / ora",
+    detail: "€22 / ora",
     description: "Per lavorare su più argomenti o preparare una parte dell'esame.",
     featured: false,
   },
   {
     id: "pack-10",
     name: "Pacchetto 10 ore",
-    priceLabel: "€170",
+    priceLabel: "€200",
     priceSuffix: " totali",
-    detail: "€17 / ora",
+    detail: "€20 / ora",
     description: "Per una preparazione completa e continuativa.",
     featured: true,
     badge: "Più conveniente",
