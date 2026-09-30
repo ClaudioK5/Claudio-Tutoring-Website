@@ -66,13 +66,22 @@ export const INTRO_VIDEO = {
 
 export const CONTACT = {
   phoneDisplay: "+39 366 322 0855",
+  phoneE164: "393663220855",
   whatsapp: "https://wa.me/393663220855",
   telegram: "https://t.me/+393663220855",
   email: "klaudio.asaro5@gmail.com",
   bookingUrl: BOOKING_URL,
   instagram: "",
   linkedin: "",
+  /** Messaggio precompilato WhatsApp (sito / ads generici) */
+  whatsappPrefill:
+    "Ciao Claudio, ho visto il sito delle ripetizioni e vorrei info su lezioni universitarie.",
 } as const;
+
+export function getWhatsAppUrl(prefill = CONTACT.whatsappPrefill) {
+  const text = encodeURIComponent(prefill);
+  return `https://wa.me/${CONTACT.phoneE164}?text=${text}`;
+}
 
 export const STATS = {
   lessonsTaught: "2.600+",
