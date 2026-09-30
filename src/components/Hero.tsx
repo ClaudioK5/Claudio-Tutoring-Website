@@ -1,5 +1,6 @@
 import { STATS, formatPrice, PRICING } from "@/lib/constants";
 import { BookingButton } from "./BookingButton";
+import { TelegramButton, WhatsAppButton } from "./ChatButtons";
 import { Reveal } from "./Reveal";
 
 export function Hero() {
@@ -48,11 +49,12 @@ export function Hero() {
             ))}
           </ul>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-col items-start gap-3">
             <BookingButton>Prenota la prima lezione</BookingButton>
-            <a href="#results" className="btn-secondary">
-              Guarda i risultati
-            </a>
+            <div className="flex flex-wrap items-center gap-3">
+              <WhatsAppButton />
+              <TelegramButton>Scrivimi su Telegram</TelegramButton>
+            </div>
           </div>
 
           <p className="mt-4 text-sm font-medium text-slate">
