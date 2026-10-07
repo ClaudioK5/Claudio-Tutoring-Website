@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { adjustLessonsAction, logout } from "@/lib/admin/actions";
 import type { StorageMode } from "@/lib/admin/store";
 import { clampLessons, earnedValue, formatEuro, type Student } from "@/lib/admin/students";
+import { CalendarPanel } from "./CalendarPanel";
 import { StudentCard } from "./StudentCard";
 import { StudentFormModal } from "./StudentFormModal";
 
@@ -170,6 +171,8 @@ export function Dashboard({ initialStudents, storageMode, loadError }: Props) {
           </div>
         )}
       </section>
+
+      <CalendarPanel />
 
       {modal.open && (
         <StudentFormModal
