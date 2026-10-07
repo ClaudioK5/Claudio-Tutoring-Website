@@ -4,7 +4,15 @@ import { redirect } from "next/navigation";
 import { verifyPin } from "./pin";
 import { createSession, deleteSession, isAuthConfigured, isAuthenticated } from "./session";
 import { getStore, StorageUnavailableError } from "./store";
-import { isPackageId, isSourceId, type Student, type StudentInput } from "./students";
+import {
+  ITEM_ORDER,
+  MAX_ITEM_COUNT,
+  emptyItems,
+  isSourceId,
+  summarizeItems,
+  type Student,
+  type StudentInput,
+} from "./students";
 
 export type LoginState = { error?: string } | undefined;
 
@@ -54,7 +62,17 @@ function parseInput(raw: unknown): StudentInput | string {
   if (name.length > 80) return "Name is too long.";
   if (!subject) return "Subject is required.";
   if (subject.length > 80) return "Subject is too long.";
-  if (!isPackageId(data.packageId)) return "Choose a package type.";
+  const rawItems = (data.items ?? {}) as Record<string, unknown>;
+  const items = emptyItems();
+  for (const id of ITEM_ORDER) {
+    const count = rawItems[id] ?? 0;
+    if (typeof count !== "number" || !Number.isInteger(count) || count < 0 || count > MAX_ITEM_COUNT) {
+      return "Invalid lesson quantity.";
+    }
+    items[id] = count;
+  }
+  if (summarizeItems(items).lessons === 0) return "Add at least one lesson or package.";
+
   if (data.source != null && data.source !== "" && !isSourceId(data.source)) {
     return "Invalid acquisition source.";
   }
@@ -62,7 +80,7 @@ function parseInput(raw: unknown): StudentInput | string {
   return {
     name,
     subject,
-    packageId: data.packageId,
+    items,
     source: isSourceId(data.source) ? data.source : null,
   };
 }

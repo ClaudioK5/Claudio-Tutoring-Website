@@ -5,9 +5,11 @@ import path from "node:path";
 import { neon } from "@neondatabase/serverless";
 import {
   clampLessons,
-  getPackage,
+  emptyItems,
   isPackageId,
   isSourceId,
+  summarizeItems,
+  type ItemCounts,
   type Student,
   type StudentInput,
 } from "./students";
@@ -41,7 +43,9 @@ type StudentRow = {
   id: string;
   name: string;
   subject: string;
-  package_id: string;
+  single_count: number;
+  pack5_count: number;
+  pack10_count: number;
   total_lessons: number;
   package_value_cents: number;
   lessons_completed: number;
@@ -54,7 +58,11 @@ function rowToStudent(row: StudentRow): Student {
     id: row.id,
     name: row.name,
     subject: row.subject,
-    packageId: isPackageId(row.package_id) ? row.package_id : "single",
+    items: {
+      single: Number(row.single_count),
+      "pack-5": Number(row.pack5_count),
+      "pack-10": Number(row.pack10_count),
+    },
     totalLessons: Number(row.total_lessons),
     packageValue: Number(row.package_value_cents) / 100,
     lessonsCompleted: Number(row.lessons_completed),
@@ -68,27 +76,45 @@ let schemaReady: Promise<void> | null = null;
 function neonStore(url: string): StudentStore {
   const sql = neon(url);
 
-  async function ready() {
+  async function migrate() {
+    await sql`
+      CREATE TABLE IF NOT EXISTS students (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        package_id TEXT,
+        single_count INTEGER NOT NULL DEFAULT 0,
+        pack5_count INTEGER NOT NULL DEFAULT 0,
+        pack10_count INTEGER NOT NULL DEFAULT 0,
+        total_lessons INTEGER NOT NULL,
+        package_value_cents INTEGER NOT NULL,
+        lessons_completed INTEGER NOT NULL DEFAULT 0,
+        source TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    // Tables created before quantities existed: add the counters and convert the old single package.
+    await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS single_count INTEGER NOT NULL DEFAULT 0`;
+    await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS pack5_count INTEGER NOT NULL DEFAULT 0`;
+    await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS pack10_count INTEGER NOT NULL DEFAULT 0`;
+    await sql`ALTER TABLE students ALTER COLUMN package_id DROP NOT NULL`;
+    await sql`
+      UPDATE students SET
+        single_count = CASE WHEN package_id = 'single' THEN 1 ELSE 0 END,
+        pack5_count = CASE WHEN package_id = 'pack-5' THEN 1 ELSE 0 END,
+        pack10_count = CASE WHEN package_id = 'pack-10' THEN 1 ELSE 0 END,
+        package_id = NULL
+      WHERE package_id IS NOT NULL
+    `;
+  }
+
+  function ready() {
     if (!schemaReady) {
-      schemaReady = sql`
-        CREATE TABLE IF NOT EXISTS students (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          subject TEXT NOT NULL,
-          package_id TEXT NOT NULL,
-          total_lessons INTEGER NOT NULL,
-          package_value_cents INTEGER NOT NULL,
-          lessons_completed INTEGER NOT NULL DEFAULT 0,
-          source TEXT,
-          created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        )
-      `
-        .then(() => undefined)
-        .catch((err) => {
-          schemaReady = null;
-          throw err;
-        });
+      schemaReady = migrate().catch((err) => {
+        schemaReady = null;
+        throw err;
+      });
     }
     return schemaReady;
   }
@@ -102,10 +128,17 @@ function neonStore(url: string): StudentStore {
 
     async create(input) {
       await ready();
-      const pkg = getPackage(input.packageId);
+      const { lessons, value } = summarizeItems(input.items);
       const rows = (await sql`
-        INSERT INTO students (id, name, subject, package_id, total_lessons, package_value_cents, source)
-        VALUES (${randomUUID()}, ${input.name}, ${input.subject}, ${pkg.id}, ${pkg.hours}, ${pkg.value * 100}, ${input.source})
+        INSERT INTO students (
+          id, name, subject, single_count, pack5_count, pack10_count,
+          total_lessons, package_value_cents, source
+        )
+        VALUES (
+          ${randomUUID()}, ${input.name}, ${input.subject},
+          ${input.items.single}, ${input.items["pack-5"]}, ${input.items["pack-10"]},
+          ${lessons}, ${Math.round(value * 100)}, ${input.source}
+        )
         RETURNING *
       `) as StudentRow[];
       return rowToStudent(rows[0]);
@@ -113,20 +146,18 @@ function neonStore(url: string): StudentStore {
 
     async update(id, input) {
       await ready();
-      const pkg = getPackage(input.packageId);
-      // Same package keeps its original value; a new package takes the current price.
+      const { lessons, value } = summarizeItems(input.items);
       const rows = (await sql`
         UPDATE students SET
           name = ${input.name},
           subject = ${input.subject},
           source = ${input.source},
-          total_lessons = CASE WHEN package_id = ${pkg.id} THEN total_lessons ELSE ${pkg.hours} END,
-          package_value_cents = CASE WHEN package_id = ${pkg.id} THEN package_value_cents ELSE ${pkg.value * 100} END,
-          lessons_completed = LEAST(
-            lessons_completed,
-            CASE WHEN package_id = ${pkg.id} THEN total_lessons ELSE ${pkg.hours} END
-          ),
-          package_id = ${pkg.id},
+          single_count = ${input.items.single},
+          pack5_count = ${input.items["pack-5"]},
+          pack10_count = ${input.items["pack-10"]},
+          total_lessons = ${lessons},
+          package_value_cents = ${Math.round(value * 100)},
+          lessons_completed = LEAST(lessons_completed, ${lessons}),
           updated_at = now()
         WHERE id = ${id}
         RETURNING *
@@ -159,9 +190,21 @@ function neonStore(url: string): StudentStore {
 const DATA_FILE = path.join(process.cwd(), ".data", "students.json");
 let fileQueue: Promise<unknown> = Promise.resolve();
 
+type StoredStudent = Omit<Student, "items"> & { items?: ItemCounts; packageId?: string };
+
+/** Records saved before quantities existed have a single `packageId` instead of `items`. */
+function normalize(record: StoredStudent): Student {
+  const { packageId, items, ...rest } = record;
+  if (items) return { ...rest, items };
+  const converted = emptyItems();
+  if (isPackageId(packageId)) converted[packageId] = 1;
+  return { ...rest, items: converted };
+}
+
 async function readFile(): Promise<Student[]> {
   try {
-    return JSON.parse(await fs.readFile(DATA_FILE, "utf8")) as Student[];
+    const raw = JSON.parse(await fs.readFile(DATA_FILE, "utf8")) as StoredStudent[];
+    return raw.map(normalize);
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") return [];
     throw err;
@@ -185,14 +228,14 @@ const fileStore: StudentStore = {
 
   create: (input) =>
     withFile(async (students) => {
-      const pkg = getPackage(input.packageId);
+      const { lessons, value } = summarizeItems(input.items);
       const student: Student = {
         id: randomUUID(),
         name: input.name,
         subject: input.subject,
-        packageId: pkg.id,
-        totalLessons: pkg.hours,
-        packageValue: pkg.value,
+        items: input.items,
+        totalLessons: lessons,
+        packageValue: value,
         lessonsCompleted: 0,
         source: input.source,
         createdAt: new Date().toISOString(),
@@ -205,18 +248,16 @@ const fileStore: StudentStore = {
     withFile(async (students) => {
       const current = students.find((s) => s.id === id);
       if (!current) return null;
-      const samePackage = current.packageId === input.packageId;
-      const pkg = getPackage(input.packageId);
-      const totalLessons = samePackage ? current.totalLessons : pkg.hours;
+      const { lessons, value } = summarizeItems(input.items);
       const updated: Student = {
         ...current,
         name: input.name,
         subject: input.subject,
         source: input.source,
-        packageId: pkg.id,
-        totalLessons,
-        packageValue: samePackage ? current.packageValue : pkg.value,
-        lessonsCompleted: Math.min(current.lessonsCompleted, totalLessons),
+        items: input.items,
+        totalLessons: lessons,
+        packageValue: value,
+        lessonsCompleted: Math.min(current.lessonsCompleted, lessons),
       };
       await writeFile(students.map((s) => (s.id === id ? updated : s)));
       return updated;
