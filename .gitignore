@@ -43,3 +43,6 @@ next-env.d.ts
 # large local videos (hosted on YouTube)
 *.mp4
 /public/videos/
+
+# admin dashboard local test data
+/.data/
