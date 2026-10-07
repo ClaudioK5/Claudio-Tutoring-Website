@@ -21,36 +21,39 @@ export const PRICING = {
   label: "A partire da",
 } as const;
 
+/**
+ * Unica fonte dei prezzi: sito (sezione Prezzi) e dashboard admin leggono da qui.
+ * `value` = prezzo totale in euro, `hours` = numero di lezioni da 1 ora.
+ */
 export const PRICING_PACKAGES = [
   {
     id: "single",
     name: "Lezione singola",
-    priceLabel: "€25",
-    priceSuffix: "/ ora",
-    detail: null as string | null,
+    hours: 1,
+    value: 25,
     description: "Per dubbi, singoli argomenti o una lezione occasionale.",
     featured: false,
   },
   {
     id: "pack-5",
     name: "Pacchetto 5 ore",
-    priceLabel: "€110",
-    priceSuffix: " totali",
-    detail: "€22 / ora",
+    hours: 5,
+    value: 110,
     description: "Per lavorare su più argomenti o preparare una parte dell'esame.",
     featured: false,
   },
   {
     id: "pack-10",
     name: "Pacchetto 10 ore",
-    priceLabel: "€200",
-    priceSuffix: " totali",
-    detail: "€20 / ora",
+    hours: 10,
+    value: 200,
     description: "Per una preparazione completa e continuativa.",
     featured: true,
     badge: "Più conveniente",
   },
 ] as const;
+
+export type PackageId = (typeof PRICING_PACKAGES)[number]["id"];
 
 /**
  * URL centrale per i CTA di prenotazione (es. Google Calendar Appointment Schedule).
