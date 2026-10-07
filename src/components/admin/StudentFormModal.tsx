@@ -8,11 +8,16 @@ import {
   updateStudentAction,
 } from "@/lib/admin/actions";
 import {
-  ADMIN_PACKAGE_LABELS,
-  ADMIN_PACKAGE_ORDER,
+  ITEM_LABELS,
+  ITEM_ORDER,
+  MAX_ITEM_COUNT,
   SOURCES,
+  emptyItems,
   formatEuro,
   getPackage,
+  itemLabel,
+  summarizeItems,
+  type ItemCounts,
   type SourceId,
   type Student,
 } from "@/lib/admin/students";
@@ -33,7 +38,7 @@ export function StudentFormModal({ student, onClose, onSaved, onDeleted }: Props
   const isEdit = student !== null;
   const [name, setName] = useState(student?.name ?? "");
   const [subject, setSubject] = useState(student?.subject ?? "");
-  const [packageId, setPackageId] = useState<PackageId | null>(student?.packageId ?? null);
+  const [items, setItems] = useState<ItemCounts>(student?.items ?? emptyItems());
   const [source, setSource] = useState<SourceId | null>(student?.source ?? null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -50,17 +55,21 @@ export function StudentFormModal({ student, onClose, onSaved, onDeleted }: Props
     };
   }, [onClose, saving]);
 
-  const packageChanged = isEdit && packageId !== student.packageId;
-  const selected = packageId ? getPackage(packageId) : null;
+  const totals = summarizeItems(items);
+  const activeItems = ITEM_ORDER.filter((id) => items[id] > 0);
+  const missingItems = ITEM_ORDER.filter((id) => items[id] === 0);
+
+  const setCount = (id: PackageId, count: number) =>
+    setItems((prev) => ({ ...prev, [id]: Math.min(Math.max(count, 0), MAX_ITEM_COUNT) }));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !subject.trim()) return setError("Name and subject are required.");
-    if (!packageId) return setError("Choose a package type.");
+    if (totals.lessons === 0) return setError("Add at least one lesson or package.");
 
     setSaving(true);
     setError(null);
-    const input = { name, subject, packageId, source };
+    const input = { name, subject, items, source };
     const res = isEdit
       ? await updateStudentAction(student.id, input)
       : await createStudentAction(input);
@@ -141,49 +150,84 @@ export function StudentFormModal({ student, onClose, onSaved, onDeleted }: Props
           </Field>
 
           <fieldset>
-            <legend className={labelClass}>Package type</legend>
-            <div className="mt-2 grid gap-2.5">
-              {ADMIN_PACKAGE_ORDER.map((id) => {
-                const pkg = getPackage(id);
-                const active = packageId === id;
-                return (
-                  <label
+            <legend className={labelClass}>Lessons & packages</legend>
+
+            {activeItems.length > 0 && (
+              <div className="mt-2 grid gap-2.5">
+                {activeItems.map((id) => {
+                  const pkg = getPackage(id);
+                  return (
+                    <div
+                      key={id}
+                      className="admin-fade flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 px-4 py-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold capitalize">{itemLabel(id, items[id])}</p>
+                        <p className="text-xs text-slate-500">
+                          {formatEuro(pkg.value)} each · {formatEuro(items[id] * pkg.value)}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        <StepButton
+                          label={`Remove one ${ITEM_LABELS[id].one}`}
+                          onClick={() => setCount(id, items[id] - 1)}
+                        >
+                          <path d="M5 12h14" strokeLinecap="round" />
+                        </StepButton>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          max={MAX_ITEM_COUNT}
+                          value={items[id]}
+                          onChange={(e) => setCount(id, Math.floor(Number(e.target.value) || 0))}
+                          aria-label={`Number of ${ITEM_LABELS[id].many}`}
+                          className="w-12 rounded-lg bg-transparent text-center text-lg font-bold tabular-nums outline-none [appearance:textfield] focus:bg-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        />
+                        <StepButton
+                          label={`Add one ${ITEM_LABELS[id].one}`}
+                          onClick={() => setCount(id, items[id] + 1)}
+                          primary
+                        >
+                          <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+                        </StepButton>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {missingItems.length > 0 && (
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                {missingItems.map((id) => (
+                  <button
                     key={id}
-                    className={`flex cursor-pointer items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 transition ${
-                      active
-                        ? "border-emerald-400 bg-emerald-50/70 ring-4 ring-emerald-500/10"
-                        : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                    }`}
+                    type="button"
+                    onClick={() => setCount(id, 1)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-slate-300 px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-700"
                   >
-                    <span className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="package"
-                        value={id}
-                        checked={active}
-                        onChange={() => setPackageId(id)}
-                        required
-                        className="h-4 w-4 accent-emerald-600"
-                      />
-                      <span>
-                        <span className="block text-sm font-semibold">{ADMIN_PACKAGE_LABELS[id]}</span>
-                        <span className="block text-xs text-slate-500">
-                          {pkg.hours} {pkg.hours === 1 ? "lesson" : "lessons"}
-                        </span>
-                      </span>
-                    </span>
-                    <span className="text-base font-bold tabular-nums">{formatEuro(pkg.value)}</span>
-                  </label>
-                );
-              })}
-            </div>
-            {selected && (
-              <p className="mt-2.5 text-xs text-slate-500">
-                Total: {selected.hours} {selected.hours === 1 ? "lesson" : "lessons"} ·{" "}
-                {formatEuro(selected.value)}
-                {packageChanged &&
-                  student.lessonsCompleted > selected.hours &&
-                  ` · completed lessons will be capped at ${selected.hours}`}
+                    <span className="text-base leading-none">+</span>
+                    <span className="capitalize">{ITEM_LABELS[id].one}</span>
+                    <span className="text-slate-400">{formatEuro(getPackage(id).value)}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <p className="mt-3 text-sm font-semibold">
+              {totals.lessons > 0 ? (
+                <>
+                  Total: {totals.lessons} {totals.lessons === 1 ? "lesson" : "lessons"} ·{" "}
+                  {formatEuro(totals.value)}
+                </>
+              ) : (
+                <span className="font-normal text-slate-400">Tap what the student bought.</span>
+              )}
+            </p>
+            {isEdit && totals.lessons > 0 && student.lessonsCompleted > totals.lessons && (
+              <p className="mt-1 text-xs text-amber-700">
+                Completed lessons will be capped at {totals.lessons}.
               </p>
             )}
           </fieldset>
@@ -288,5 +332,34 @@ function Field({
       </label>
       {children}
     </div>
+  );
+}
+
+function StepButton({
+  label,
+  onClick,
+  primary = false,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  primary?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={`flex h-9 w-9 items-center justify-center rounded-xl transition active:scale-95 ${
+        primary
+          ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/30 hover:bg-emerald-600"
+          : "border border-slate-200 bg-white text-[#0B1E3F] hover:border-slate-300"
+      }`}
+    >
+      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
+        {children}
+      </svg>
+    </button>
   );
 }

@@ -1,9 +1,11 @@
 "use client";
 
 import {
-  ADMIN_PACKAGE_LABELS,
+  ITEM_ORDER,
   earnedValue,
   formatEuro,
+  getPackage,
+  itemLabel,
   sourceLabel,
   type Student,
 } from "@/lib/admin/students";
@@ -45,12 +47,23 @@ export function StudentCard({ student, index, onAdjust, onEdit }: Props) {
         </button>
       </header>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-[#0B1E3F]/[0.06] px-3 py-1 text-xs font-semibold text-[#0B1E3F]">
-          {ADMIN_PACKAGE_LABELS[student.packageId]}
-        </span>
+      <ul className="mt-4 space-y-1.5 rounded-2xl bg-slate-50 px-4 py-3 text-sm">
+        {ITEM_ORDER.filter((id) => student.items[id] > 0).map((id) => (
+          <li key={id} className="flex items-center justify-between gap-3">
+            <span className="text-slate-600">
+              <span className="font-semibold text-[#0B1E3F]">{student.items[id]} ×</span>{" "}
+              {itemLabel(id, student.items[id])}
+            </span>
+            <span className="font-medium tabular-nums text-slate-500">
+              {formatEuro(student.items[id] * getPackage(id).value)}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-          {formatEuro(student.packageValue)}
+          Total {formatEuro(student.packageValue)}
         </span>
         {finished && (
           <span className="admin-fade inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1 text-xs font-semibold text-white shadow-sm shadow-emerald-500/30">
@@ -124,6 +137,21 @@ export function StudentCard({ student, index, onAdjust, onEdit }: Props) {
         </span>
         {source && <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium">{source}</span>}
       </footer>
+
+      <button
+        type="button"
+        onClick={onEdit}
+        className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition hover:-translate-y-0.5 active:scale-[0.98] ${
+          finished
+            ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+            : "border-slate-200 bg-white text-[#0B1E3F] hover:border-slate-300 hover:shadow-sm"
+        }`}
+      >
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
+          <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+        </svg>
+        Add lessons
+      </button>
     </article>
   );
 }
