@@ -48,14 +48,16 @@ export function Pricing() {
                 </p>
 
                 <p className="mt-4">
-                  <span className="price-figure text-5xl leading-none">{pkg.priceLabel}</span>
+                  <span className="price-figure text-5xl leading-none">€{pkg.value}</span>
                   <span className="ml-1 text-lg font-sans font-medium text-slate">
-                    {pkg.priceSuffix}
+                    {pkg.hours > 1 ? " totali" : "/ ora"}
                   </span>
                 </p>
 
-                {pkg.detail && (
-                  <p className="mt-2 text-sm font-medium text-blue">{pkg.detail}</p>
+                {pkg.hours > 1 && (
+                  <p className="mt-2 text-sm font-medium text-blue">
+                    €{pkg.value / pkg.hours} / ora
+                  </p>
                 )}
 
                 <p className="mt-4 text-sm leading-relaxed text-slate">
