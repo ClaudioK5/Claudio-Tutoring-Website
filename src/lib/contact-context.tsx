@@ -10,6 +10,23 @@ import {
 } from "react";
 import { BOOKING_URL, hasBookingUrl } from "@/lib/constants";
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+const GOOGLE_ADS_CONVERSION = {
+  send_to: "AW-18516959609/r5J3CPWD_p4dEPnCyf1E",
+  value: 1.0,
+  currency: "EUR",
+} as const;
+
+/** Fires the Google Ads "Prenota" conversion once per call; never blocks navigation. */
+function reportBookingConversion() {
+  window.gtag?.("event", "conversion", { ...GOOGLE_ADS_CONVERSION });
+}
+
 type ContactContextValue = {
   isOpen: boolean;
   openContact: () => void;
@@ -28,6 +45,7 @@ export function ContactProvider({ children }: { children: ReactNode }) {
   const handleBooking = useCallback(() => {
     if (hasBookingUrl()) {
       window.open(BOOKING_URL, "_blank", "noopener,noreferrer");
+      reportBookingConversion();
       return;
     }
     setIsOpen(true);
