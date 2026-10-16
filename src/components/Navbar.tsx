@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 import { BookingButton } from "./BookingButton";
@@ -32,8 +33,15 @@ export function Navbar() {
     >
       <div className="container-page flex h-[4.25rem] items-center justify-between gap-4">
         <a href="#top" className="group flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy text-sm font-bold text-white shadow-sm">
-            C
+          <span className="relative h-9 w-9 overflow-hidden rounded-xl bg-black shadow-sm ring-1 ring-navy/10">
+            <Image
+              src="/images/logo-claudio-tutoring.png"
+              alt=""
+              width={36}
+              height={36}
+              className="h-full w-full object-cover"
+              priority
+            />
           </span>
           <span className="font-display text-[1.05rem] font-semibold tracking-tight text-navy">
             {SITE.brand}
