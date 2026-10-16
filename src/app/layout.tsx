@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Manrope } from "next/font/google";
+import Script from "next/script";
 import { Providers } from "@/components/Providers";
 import { SITE } from "@/lib/constants";
 import "./globals.css";
+
+const GOOGLE_ADS_ID = "AW-18516959609";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -83,6 +86,18 @@ export default function RootLayout({
   return (
     <html lang="it" className={`${manrope.variable} ${fraunces.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans text-ink">
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GOOGLE_ADS_ID}');
+          `}
+        </Script>
         <Providers>{children}</Providers>
       </body>
     </html>
