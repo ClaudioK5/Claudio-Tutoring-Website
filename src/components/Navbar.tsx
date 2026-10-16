@@ -33,13 +33,13 @@ export function Navbar() {
     >
       <div className="container-page flex h-[4.25rem] items-center justify-between gap-4">
         <a href="#top" className="group flex items-center gap-2.5">
-          <span className="relative h-9 w-9 overflow-hidden rounded-xl bg-black shadow-sm ring-1 ring-navy/10">
+          <span className="relative h-9 w-9 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-navy/10">
             <Image
-              src="/images/logo-claudio-tutoring.png"
+              src="/images/favicon-tutoring.png"
               alt=""
               width={36}
               height={36}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
               priority
             />
           </span>
