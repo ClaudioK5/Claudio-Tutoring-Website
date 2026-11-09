@@ -4,6 +4,7 @@ import { TrustStats } from "@/components/TrustStats";
 import { ValueProposition } from "@/components/ValueProposition";
 import { Subjects } from "@/components/Subjects";
 import { ExperienceValue } from "@/components/ExperienceValue";
+import { SelectedTutors } from "@/components/SelectedTutors";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Results } from "@/components/Results";
 import { Testimonials } from "@/components/Testimonials";
@@ -24,6 +25,7 @@ export default function HomePage() {
         <ValueProposition />
         <Subjects />
         <ExperienceValue />
+        <SelectedTutors />
         <HowItWorks />
         <Results />
         <Testimonials />
