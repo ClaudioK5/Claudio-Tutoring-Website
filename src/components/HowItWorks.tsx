@@ -30,7 +30,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="section-pad">
+    <section id="how-it-works" className="section-pad bg-ivory">
       <div className="container-page">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
