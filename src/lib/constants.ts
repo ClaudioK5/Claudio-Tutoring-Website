@@ -71,7 +71,7 @@ export const INTRO_VIDEO = {
 export const STUDENT_TESTIMONIAL_VIDEO = {
   src: "https://pub-bf0c83966aed4c87b2a3c71920dd4931.r2.dev/elisamaffucciproof.mp4",
   poster: "",
-  name: "Elisa Maffucci",
+  name: "Elisa M.",
   detail: "Sapienza · Chimica & Analisi 2",
 } as const;
 
