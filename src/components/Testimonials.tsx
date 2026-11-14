@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TESTIMONIALS } from "@/lib/constants";
+import { STUDENT_TESTIMONIAL_VIDEO, TESTIMONIALS } from "@/lib/constants";
 import { Reveal } from "./Reveal";
 
 const PREVIEW_LENGTH = 155;
@@ -80,9 +80,46 @@ export function Testimonials() {
             </h2>
           </div>
         </Reveal>
+
+        <Reveal delayMs={80}>
+          <div className="mx-auto mt-10 flex max-w-md flex-col items-center">
+            <p className="mb-4 text-center text-sm font-medium text-slate">
+              Te lo racconta una studentessa
+            </p>
+            <div className="card-surface w-full max-w-[280px] overflow-hidden p-2 sm:max-w-[300px] sm:p-2.5">
+              <div className="relative aspect-[9/16] overflow-hidden rounded-[1.1rem] bg-navy shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]">
+                <video
+                  className="h-full w-full object-cover"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  {...(STUDENT_TESTIMONIAL_VIDEO.poster
+                    ? { poster: STUDENT_TESTIMONIAL_VIDEO.poster }
+                    : {})}
+                  aria-label={`Video-testimonianza di ${STUDENT_TESTIMONIAL_VIDEO.name}`}
+                >
+                  <source src={STUDENT_TESTIMONIAL_VIDEO.src} type="video/mp4" />
+                  Il tuo browser non supporta la riproduzione video.
+                </video>
+              </div>
+            </div>
+            <div className="mt-4 text-center">
+              <p className="text-sm font-semibold text-navy">
+                {STUDENT_TESTIMONIAL_VIDEO.name}
+              </p>
+              <p className="mt-0.5 text-xs text-slate">{STUDENT_TESTIMONIAL_VIDEO.detail}</p>
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delayMs={140}>
+          <p className="mt-12 text-center text-xs font-bold uppercase tracking-[0.14em] text-slate">
+            Altre recensioni
+          </p>
+        </Reveal>
       </div>
 
-      <div className="relative mt-10">
+      <div className="relative mt-6">
         {/* Soft edge fades */}
         <div
           className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-ivory to-transparent transition-opacity sm:w-16 ${
