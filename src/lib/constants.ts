@@ -67,6 +67,14 @@ export const INTRO_VIDEO = {
   poster: "/images/video-poster.png",
 } as const;
 
+/** Video-testimonianza studentessa — stesso bucket R2 */
+export const STUDENT_TESTIMONIAL_VIDEO = {
+  src: "https://pub-bf0c83966aed4c87b2a3c71920dd4931.r2.dev/elisamaffucciproof.mp4",
+  poster: "",
+  name: "Elisa Maffucci",
+  detail: "Sapienza · Chimica & Analisi 2",
+} as const;
+
 export const CONTACT = {
   phoneDisplay: "+39 366 322 0855",
   phoneE164: "393663220855",
