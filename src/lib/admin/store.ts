@@ -7,7 +7,7 @@ import {
   clampLessons,
   emptyItems,
   isPackageId,
-  isSourceId,
+  normalizeSource,
   summarizeItems,
   type ItemCounts,
   type Student,
@@ -66,7 +66,7 @@ function rowToStudent(row: StudentRow): Student {
     totalLessons: Number(row.total_lessons),
     packageValue: Number(row.package_value_cents) / 100,
     lessonsCompleted: Number(row.lessons_completed),
-    source: isSourceId(row.source) ? row.source : null,
+    source: normalizeSource(row.source),
     createdAt: new Date(row.created_at).toISOString(),
   };
 }
@@ -194,11 +194,12 @@ type StoredStudent = Omit<Student, "items"> & { items?: ItemCounts; packageId?: 
 
 /** Records saved before quantities existed have a single `packageId` instead of `items`. */
 function normalize(record: StoredStudent): Student {
-  const { packageId, items, ...rest } = record;
-  if (items) return { ...rest, items };
+  const { packageId, items, source, ...rest } = record;
+  const normalizedSource = normalizeSource(source);
+  if (items) return { ...rest, items, source: normalizedSource };
   const converted = emptyItems();
   if (isPackageId(packageId)) converted[packageId] = 1;
-  return { ...rest, items: converted };
+  return { ...rest, items: converted, source: normalizedSource };
 }
 
 async function readFile(): Promise<Student[]> {

@@ -12,12 +12,26 @@ export const MAX_ITEM_COUNT = 99;
 
 export const SOURCES = [
   { id: "whatsapp", label: "WhatsApp" },
-  { id: "meta-ads", label: "Meta Ads" },
+  { id: "google-ads", label: "Google Ads" },
   { id: "referral", label: "Referral" },
   { id: "other", label: "Other" },
 ] as const;
 
 export type SourceId = (typeof SOURCES)[number]["id"];
+
+/** Soft badge styles per funnel — visible on the card at a glance. */
+export const SOURCE_BADGE_STYLES: Record<SourceId, string> = {
+  whatsapp: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/15",
+  "google-ads": "bg-amber-50 text-amber-800 ring-1 ring-amber-500/20",
+  referral: "bg-[#C9A45C]/15 text-[#8A6B2E] ring-1 ring-[#C9A45C]/25",
+  other: "bg-slate-100 text-slate-600 ring-1 ring-slate-300/40",
+};
+
+/** Maps legacy `meta-ads` values (if any) to Google Ads. */
+export function normalizeSource(value: unknown): SourceId | null {
+  if (value === "meta-ads") return "google-ads";
+  return isSourceId(value) ? value : null;
+}
 
 /** How many of each lesson type / package the student has bought. */
 export type ItemCounts = Record<PackageId, number>;
@@ -57,7 +71,7 @@ export function isPackageId(value: unknown): value is PackageId {
 }
 
 export function isSourceId(value: unknown): value is SourceId {
-  return SOURCES.some((s) => s.id === value);
+  return typeof value === "string" && SOURCES.some((s) => s.id === value);
 }
 
 export function sourceLabel(id: SourceId | null) {
