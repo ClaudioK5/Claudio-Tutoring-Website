@@ -98,6 +98,19 @@ export function earnedValue(student: Student) {
   return (student.lessonsCompleted * student.packageValue) / student.totalLessons;
 }
 
+/** Revenue and €/hour for Google Ads students only — useful for CAC. */
+export function googleAdsMetrics(students: Student[]) {
+  const ads = students.filter((s) => s.source === "google-ads");
+  const revenue = ads.reduce((sum, s) => sum + earnedValue(s), 0);
+  const lessons = ads.reduce((sum, s) => sum + s.lessonsCompleted, 0);
+  return {
+    studentCount: ads.length,
+    lessons,
+    revenue,
+    hourlyRate: lessons > 0 ? revenue / lessons : null,
+  };
+}
+
 export function clampLessons(value: number, total: number) {
   return Math.min(Math.max(value, 0), total);
 }
