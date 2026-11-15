@@ -3,7 +3,13 @@
 import { useCallback, useRef, useState } from "react";
 import { adjustLessonsAction, logout } from "@/lib/admin/actions";
 import type { StorageMode } from "@/lib/admin/store";
-import { clampLessons, earnedValue, formatEuro, type Student } from "@/lib/admin/students";
+import {
+  clampLessons,
+  earnedValue,
+  formatEuro,
+  googleAdsMetrics,
+  type Student,
+} from "@/lib/admin/students";
 import { CalendarPanel } from "./CalendarPanel";
 import { StudentCard } from "./StudentCard";
 import { StudentFormModal } from "./StudentFormModal";
@@ -25,6 +31,7 @@ export function Dashboard({ initialStudents, storageMode, loadError }: Props) {
   const canEdit = storageMode !== "none" && !loadError;
   const earnings = students.reduce((sum, s) => sum + earnedValue(s), 0);
   const lessonsDone = students.reduce((sum, s) => sum + s.lessonsCompleted, 0);
+  const ads = googleAdsMetrics(students);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -132,6 +139,53 @@ export function Dashboard({ initialStudents, storageMode, loadError }: Props) {
             <Stat label={students.length === 1 ? "student" : "students"} value={students.length} />
             <Stat label={lessonsDone === 1 ? "lesson completed" : "lessons completed"} value={lessonsDone} />
           </div>
+        </div>
+      </section>
+
+      <section className="admin-rise mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="admin-card relative overflow-hidden p-6 sm:p-7">
+          <div
+            className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-amber-400/15 blur-2xl"
+            aria-hidden
+          />
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700/80">
+            Google Ads revenue
+          </p>
+          <p
+            key={`ads-rev-${ads.revenue}`}
+            className="admin-pop mt-2 text-3xl font-extrabold tabular-nums tracking-tight text-[#0B1E3F] sm:text-4xl"
+          >
+            {formatEuro(ads.revenue)}
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            From Google Ads students only
+            {ads.studentCount > 0 && (
+              <>
+                {" "}
+                · {ads.studentCount} {ads.studentCount === 1 ? "student" : "students"} · {ads.lessons}{" "}
+                {ads.lessons === 1 ? "lesson" : "lessons"}
+              </>
+            )}
+          </p>
+        </div>
+
+        <div className="admin-card relative overflow-hidden p-6 sm:p-7">
+          <div
+            className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-amber-400/15 blur-2xl"
+            aria-hidden
+          />
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700/80">
+            Google Ads €/hour
+          </p>
+          <p
+            key={`ads-rate-${ads.hourlyRate ?? "none"}`}
+            className="admin-pop mt-2 text-3xl font-extrabold tabular-nums tracking-tight text-[#0B1E3F] sm:text-4xl"
+          >
+            {ads.hourlyRate == null ? "—" : formatEuro(ads.hourlyRate)}
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            Revenue ÷ completed lessons from Google Ads
+          </p>
         </div>
       </section>
 
