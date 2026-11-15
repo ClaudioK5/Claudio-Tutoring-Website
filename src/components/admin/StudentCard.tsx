@@ -2,6 +2,7 @@
 
 import {
   ITEM_ORDER,
+  SOURCE_BADGE_STYLES,
   earnedValue,
   formatEuro,
   getPackage,
@@ -33,6 +34,17 @@ export function StudentCard({ student, index, onAdjust, onEdit }: Props) {
         <div className="min-w-0">
           <h3 className="truncate text-xl font-bold">{student.name}</h3>
           <p className="mt-0.5 truncate text-sm font-medium text-slate-500">{student.subject}</p>
+          {student.source && source ? (
+            <span
+              className={`mt-2 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide ${SOURCE_BADGE_STYLES[student.source]}`}
+            >
+              Via {source}
+            </span>
+          ) : (
+            <span className="mt-2 inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-400 ring-1 ring-slate-200/80">
+              No source
+            </span>
+          )}
         </div>
         <button
           type="button"
@@ -130,12 +142,11 @@ export function StudentCard({ student, index, onAdjust, onEdit }: Props) {
         </div>
       </dl>
 
-      <footer className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-slate-500">
+      <footer className="mt-5 border-t border-slate-100 pt-4 text-xs text-slate-500">
         <span>
           Earned <span className="font-semibold text-[#0B1E3F]">{formatEuro(earnedValue(student))}</span>{" "}
           of {formatEuro(student.packageValue)}
         </span>
-        {source && <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium">{source}</span>}
       </footer>
 
       <button
