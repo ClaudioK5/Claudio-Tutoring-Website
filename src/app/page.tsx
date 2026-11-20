@@ -3,6 +3,7 @@ import { Hero } from "@/components/Hero";
 import { TrustStats } from "@/components/TrustStats";
 import { ValueProposition } from "@/components/ValueProposition";
 import { Subjects } from "@/components/Subjects";
+import { EserciziariPreview } from "@/components/EserciziariPreview";
 import { ExperienceValue } from "@/components/ExperienceValue";
 import { SelectedTutors } from "@/components/SelectedTutors";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -24,6 +25,7 @@ export default function HomePage() {
         <TrustStats />
         <ValueProposition />
         <Subjects />
+        <EserciziariPreview />
         <ExperienceValue />
         <SelectedTutors />
         <HowItWorks />
