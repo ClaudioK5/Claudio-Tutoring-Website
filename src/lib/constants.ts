@@ -106,11 +106,12 @@ export const STATS = {
 } as const;
 
 export const NAV_LINKS = [
-  { href: "#subjects", label: "Materie" },
-  { href: "#how-it-works", label: "Come funziona" },
-  { href: "#results", label: "Esperienza" },
-  { href: "#about", label: "Chi sono" },
-  { href: "#pricing", label: "Prezzi" },
+  { href: "/#subjects", label: "Materie" },
+  { href: "/eserciziari", label: "Eserciziari" },
+  { href: "/#how-it-works", label: "Come funziona" },
+  { href: "/#results", label: "Esperienza" },
+  { href: "/#about", label: "Chi sono" },
+  { href: "/#pricing", label: "Prezzi" },
 ] as const;
 
 export const SUBJECTS = [
