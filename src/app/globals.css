@@ -221,6 +221,12 @@ h4 {
   }
 }
 
+/* --------------------------- Eserciziari preview slider --------------------------- */
+
+.preview-slide-fade {
+  animation: proofFade 280ms ease-out;
+}
+
 /* ------------------------------ Admin dashboard ----------------------------- */
 
 .admin-root {
