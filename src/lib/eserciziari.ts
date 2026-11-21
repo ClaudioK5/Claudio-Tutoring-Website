@@ -53,11 +53,19 @@ export type BookPreviewPage =
     }
   | { kind: "cta" };
 
-/** Tutte le pagine PDF: sharp solo prima (esercizi) e ultima (soluzioni). */
-function pdfPreviewPages(folder: string, pageCount: number): BookPreviewPage[] {
+/**
+ * Tutte le pagine PDF: sharp di default solo prima (esercizi) e ultima (soluzioni).
+ * Passa `extraSharp` per sbloccare altre pagine (es. 11 se 12 è solo una nota).
+ */
+function pdfPreviewPages(
+  folder: string,
+  pageCount: number,
+  extraSharp: readonly number[] = [],
+): BookPreviewPage[] {
+  const sharp = new Set<number>([1, pageCount, ...extraSharp]);
   return Array.from({ length: pageCount }, (_, i) => {
     const pdfPage = i + 1;
-    const locked = pdfPage !== 1 && pdfPage !== pageCount;
+    const locked = !sharp.has(pdfPage);
     return {
       kind: "pdf" as const,
       src: `/images/eserciziari-preview/${folder}/page-${String(pdfPage).padStart(2, "0")}.png`,
@@ -192,7 +200,7 @@ export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
         src: "/images/cover-studi-di-funzione-v4.jpg",
         label: "Copertina",
       },
-      ...pdfPreviewPages("studi-di-funzione", 12),
+      ...pdfPreviewPages("studi-di-funzione", 12, [11]),
       { kind: "cta" },
     ],
   },
