@@ -184,7 +184,8 @@ export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
     coverAccent: "#6B21A8",
     coverLabel: "SF",
     coverImage: "/images/cover-studi-di-funzione-v4.jpg",
-    privatePdfKey: "ClaudioTutoring_15_Studi_di_Funzione_Premium_v3.pdf",
+    privatePdfKey:
+      "ClaudioTutoring_15_Studi_di_Funzione_Stile_Originale_1.pdf",
     previewAvailable: true,
     bookPreview: [
       {
@@ -192,7 +193,7 @@ export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
         src: "/images/cover-studi-di-funzione-v4.jpg",
         label: "Copertina",
       },
-      ...pdfPreviewPages("studi-di-funzione", 17),
+      ...pdfPreviewPages("studi-di-funzione", 12),
       { kind: "cta" },
     ],
   },
