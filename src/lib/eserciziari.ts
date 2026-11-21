@@ -99,8 +99,7 @@ export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
     coverAccent: "#1D3F8F",
     coverLabel: "AL",
     coverImage: "/images/cover-sistemi-lineari.jpg",
-    privatePdfKey:
-      "ClaudioTutoring_Sistemi_Lineari_Rouche_Capelli_20_Esercizi_v2.pdf",
+    privatePdfKey: "ClaudioTutoring_20_Sistemi_Lineari_Gauss_Completo.pdf",
     previewAvailable: true,
     bookPreview: [
       {
@@ -108,7 +107,7 @@ export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
         src: "/images/cover-sistemi-lineari.jpg",
         label: "Copertina",
       },
-      ...pdfPreviewPages("sistemi-lineari", 13),
+      ...pdfPreviewPages("sistemi-lineari", 18),
       { kind: "cta" },
     ],
   },
