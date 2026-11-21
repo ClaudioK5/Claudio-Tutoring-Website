@@ -4,7 +4,7 @@
  */
 export const ESERCIZIARI_R2_KEYS: Record<string, string> = {
   "sistemi-lineari-rouche-capelli":
-    "ClaudioTutoring_Sistemi_Lineari_Rouche_Capelli_20_Esercizi_v2.pdf",
+    "ClaudioTutoring_20_Sistemi_Lineari_Gauss_Completo.pdf",
   "numeri-complessi-e-integrali": "ClaudioTutoring_Complessi_e_Integrali.pdf",
   "studi-di-funzione":
     "ClaudioTutoring_15_Studi_di_Funzione_Stile_Originale_1.pdf",
