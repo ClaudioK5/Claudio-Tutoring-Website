@@ -56,6 +56,7 @@ export async function startEserciziarioCheckout(slug: string): Promise<CheckoutS
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
+      allow_promotion_codes: true,
       success_url: `${origin}/eserciziari/acquisto/successo?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/eserciziari/${product.slug}?checkout=annullato`,
       metadata: {
