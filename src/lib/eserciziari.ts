@@ -86,7 +86,7 @@ export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
     difficulty: "Crescente",
     format: "PDF",
     priceEuro: 5.9,
-    status: "draft",
+    status: "live",
     shortDescription:
       "Sistemi 2×2, 3×3 e 4×4, parametro k e soluzioni svolte passo dopo passo.",
     description:
@@ -128,7 +128,7 @@ export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
     difficulty: "Crescente",
     format: "PDF",
     priceEuro: 5.9,
-    status: "draft",
+    status: "live",
     shortDescription:
       "Numeri complessi e integrali con soluzioni spiegate passo dopo passo.",
     description:
@@ -170,7 +170,7 @@ export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
     difficulty: "Crescente",
     format: "PDF",
     priceEuro: 5.9,
-    status: "draft",
+    status: "live",
     shortDescription:
       "15 studi di funzione completi: dominio, limiti, derivate, asintoti e grafici.",
     description:
