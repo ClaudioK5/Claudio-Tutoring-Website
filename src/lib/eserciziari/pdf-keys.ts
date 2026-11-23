@@ -3,6 +3,8 @@
  * slug prodotto → nome file esatto su R2.
  */
 export const ESERCIZIARI_R2_KEYS: Record<string, string> = {
+  "continuita-derivabilita-differenziabilita":
+    "Dispensa_Analisi2_20_Esercizi_Soluzioni_Dettagliate.pdf",
   "sistemi-lineari-rouche-capelli":
     "ClaudioTutoring_20_Sistemi_Lineari_Gauss_Completo.pdf",
   "numeri-complessi-e-integrali": "ClaudioTutoring_Complessi_e_Integrali.pdf",
