@@ -78,6 +78,48 @@ function pdfPreviewPages(
 
 export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
   {
+    slug: "continuita-derivabilita-differenziabilita",
+    title: "Continuità, Derivabilità e Differenziabilità",
+    category: "analisi-2",
+    subjectLabel: "Analisi 2",
+    exerciseCount: 20,
+    difficulty: "Crescente",
+    format: "PDF",
+    priceEuro: 5.9,
+    status: "live",
+    shortDescription:
+      "Limiti in R², derivate direzionali, gradiente e differenziabilità con soluzioni complete.",
+    description:
+      "Una raccolta di 20 esercizi su continuità, derivate parziali e direzionali, differenziabilità e formula del gradiente — i temi tipici di Analisi Matematica II. Ogni svolgimento è dettagliato passo dopo passo, così puoi ripercorrere il ragionamento come a lezione.",
+    topics: [
+      "Limiti e continuità in R²",
+      "Derivate parziali e direzionali",
+      "Gradiente e piano tangente",
+      "Differenziabilità",
+      "Esercizi in stile esame di Analisi 2",
+    ],
+    includes: [
+      "20 esercizi a difficoltà crescente",
+      "Soluzioni complete e commentate",
+      "Formato PDF scaricabile dopo l'acquisto",
+      "Ideale per ripasso e preparazione all'esame di Analisi 2",
+    ],
+    coverAccent: "#0B5D5E",
+    coverLabel: "A2",
+    coverImage: "/images/cover-continuita-derivabilita.jpg",
+    privatePdfKey: "Dispensa_Analisi2_20_Esercizi_Soluzioni_Dettagliate.pdf",
+    previewAvailable: true,
+    bookPreview: [
+      {
+        kind: "cover",
+        src: "/images/cover-continuita-derivabilita.jpg",
+        label: "Copertina",
+      },
+      ...pdfPreviewPages("continuita-derivabilita", 16),
+      { kind: "cta" },
+    ],
+  },
+  {
     slug: "sistemi-lineari-rouche-capelli",
     title: "Sistemi Lineari e Rouché–Capelli",
     category: "algebra-lineare",
