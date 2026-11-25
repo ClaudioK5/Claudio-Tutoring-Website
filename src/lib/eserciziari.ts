@@ -78,6 +78,48 @@ function pdfPreviewPages(
 
 export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
   {
+    slug: "basi-e-sottospazi-vettoriali",
+    title: "Basi e Sottospazi Vettoriali",
+    category: "algebra-lineare",
+    subjectLabel: "Algebra Lineare",
+    exerciseCount: 20,
+    difficulty: "Crescente",
+    format: "PDF",
+    priceEuro: 5.9,
+    status: "live",
+    shortDescription:
+      "Generatori, indipendenza lineare, dimensione, nuclei e immagini con soluzioni complete.",
+    description:
+      "Una raccolta di 20 esercizi a difficoltà crescente su basi, dimensione, generatori, indipendenza lineare, nuclei, immagini, somme e intersezioni di sottospazi. Ogni svolgimento è dettagliato passo dopo passo, come si richiede all'esame di Algebra Lineare.",
+    topics: [
+      "Generatori e Span",
+      "Indipendenza lineare",
+      "Basi e dimensione",
+      "Nucleo e immagine",
+      "Somme e intersezioni di sottospazi",
+    ],
+    includes: [
+      "20 esercizi a difficoltà crescente",
+      "Soluzioni complete e commentate",
+      "Formato PDF scaricabile dopo l'acquisto",
+      "Ideale per ripasso e preparazione all'esame di Algebra Lineare",
+    ],
+    coverAccent: "#7C2D12",
+    coverLabel: "AL",
+    coverImage: "/images/cover-basi-sottospazi.jpg",
+    privatePdfKey: "ClaudioTutoring_20_Esercizi_Basi_Sottospazi_Vettoriali.pdf",
+    previewAvailable: true,
+    bookPreview: [
+      {
+        kind: "cover",
+        src: "/images/cover-basi-sottospazi.jpg",
+        label: "Copertina",
+      },
+      ...pdfPreviewPages("basi-sottospazi", 11),
+      { kind: "cta" },
+    ],
+  },
+  {
     slug: "continuita-derivabilita-differenziabilita",
     title: "Continuità, Derivabilità e Differenziabilità",
     category: "analisi-2",
