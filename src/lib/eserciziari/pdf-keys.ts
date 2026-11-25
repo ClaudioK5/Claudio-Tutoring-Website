@@ -3,6 +3,8 @@
  * slug prodotto → nome file esatto su R2.
  */
 export const ESERCIZIARI_R2_KEYS: Record<string, string> = {
+  "basi-e-sottospazi-vettoriali":
+    "ClaudioTutoring_20_Esercizi_Basi_Sottospazi_Vettoriali.pdf",
   "continuita-derivabilita-differenziabilita":
     "Dispensa_Analisi2_20_Esercizi_Soluzioni_Dettagliate.pdf",
   "sistemi-lineari-rouche-capelli":
