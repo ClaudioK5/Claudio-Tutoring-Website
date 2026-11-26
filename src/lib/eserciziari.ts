@@ -78,6 +78,49 @@ function pdfPreviewPages(
 
 export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
   {
+    slug: "massimi-e-minimi-vincolati",
+    title: "Massimi e Minimi Vincolati",
+    category: "analisi-2",
+    subjectLabel: "Analisi 2",
+    exerciseCount: 35,
+    difficulty: "Crescente",
+    format: "PDF",
+    priceEuro: 5.9,
+    status: "live",
+    shortDescription:
+      "35 esercizi: moltiplicatori di Lagrange, 1 e 2 vincoli, soluzioni passo dopo passo.",
+    description:
+      "Una raccolta di 35 esercizi di difficoltà crescente su massimi e minimi vincolati: moltiplicatori di Lagrange, punti interni, frontiere, vincoli attivi e intersezioni. Tracce e svolgimenti separati, pensati per l'esame di Analisi Matematica II.",
+    topics: [
+      "Moltiplicatori di Lagrange",
+      "Vincoli singoli e doppi",
+      "Punti interni e frontiere",
+      "Vincoli attivi e intersezioni",
+      "Esercizi in stile esame di Analisi 2",
+    ],
+    includes: [
+      "35 esercizi a difficoltà crescente",
+      "Soluzioni complete passo dopo passo",
+      "Formato PDF scaricabile dopo l'acquisto",
+      "Ideale per ripasso e preparazione all'esame di Analisi 2",
+    ],
+    coverAccent: "#9A3412",
+    coverLabel: "A2",
+    coverImage: "/images/cover-massimi-minimi-vincolati.jpg",
+    privatePdfKey:
+      "ClaudioTutoring_35_Massimi_Minimi_Lagrange_Svolgimenti_Completi.pdf",
+    previewAvailable: true,
+    bookPreview: [
+      {
+        kind: "cover",
+        src: "/images/cover-massimi-minimi-vincolati.jpg",
+        label: "Copertina",
+      },
+      ...pdfPreviewPages("massimi-minimi-vincolati", 31),
+      { kind: "cta" },
+    ],
+  },
+  {
     slug: "100-limiti",
     title: "100 Limiti",
     category: "analisi-1",
