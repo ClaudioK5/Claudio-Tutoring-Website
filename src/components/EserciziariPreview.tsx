@@ -4,7 +4,7 @@ import { Reveal } from "./Reveal";
 import { HomePreviewCard } from "./eserciziari/HomePreviewCard";
 
 export function EserciziariPreview() {
-  const preview = ESERCIZIARI_PRODUCTS.slice(0, 6);
+  const preview = ESERCIZIARI_PRODUCTS.slice(0, 7);
 
   return (
     <section
