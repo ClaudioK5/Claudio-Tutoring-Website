@@ -78,6 +78,48 @@ function pdfPreviewPages(
 
 export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
   {
+    slug: "100-limiti",
+    title: "100 Limiti",
+    category: "analisi-1",
+    subjectLabel: "Analisi 1",
+    exerciseCount: 100,
+    difficulty: "Crescente",
+    format: "PDF",
+    priceEuro: 5.9,
+    status: "live",
+    shortDescription:
+      "100 limiti: forme indeterminate, limiti notevoli, confronti, Taylor e successioni.",
+    description:
+      "Una raccolta ampia di 100 esercizi di difficoltà crescente su limiti di funzioni e successioni: limiti immediati, forme indeterminate, limiti notevoli, confronti asintotici, sviluppi di Taylor e successioni. Tracce e svolgimenti separati, pensati per allenarti all'esame di Analisi 1.",
+    topics: [
+      "Limiti immediati e forme indeterminate",
+      "Limiti notevoli",
+      "Confronti asintotici",
+      "Sviluppi di Taylor",
+      "Limiti di successioni",
+    ],
+    includes: [
+      "100 esercizi a difficoltà crescente",
+      "Soluzioni dettagliate passo dopo passo",
+      "Formato PDF scaricabile dopo l'acquisto",
+      "Ideale per ripasso e preparazione all'esame di Analisi 1",
+    ],
+    coverAccent: "#14532D",
+    coverLabel: "A1",
+    coverImage: "/images/cover-100-limiti.jpg",
+    privatePdfKey: "ClaudioTutoring_100_Limiti_Soluzioni_Dettagliate.pdf",
+    previewAvailable: true,
+    bookPreview: [
+      {
+        kind: "cover",
+        src: "/images/cover-100-limiti.jpg",
+        label: "Copertina",
+      },
+      ...pdfPreviewPages("100-limiti", 23),
+      { kind: "cta" },
+    ],
+  },
+  {
     slug: "basi-e-sottospazi-vettoriali",
     title: "Basi e Sottospazi Vettoriali",
     category: "algebra-lineare",
