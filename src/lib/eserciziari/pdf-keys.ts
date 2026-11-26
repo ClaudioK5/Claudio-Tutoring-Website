@@ -3,6 +3,8 @@
  * slug prodotto → nome file esatto su R2.
  */
 export const ESERCIZIARI_R2_KEYS: Record<string, string> = {
+  "massimi-e-minimi-vincolati":
+    "ClaudioTutoring_35_Massimi_Minimi_Lagrange_Svolgimenti_Completi.pdf",
   "100-limiti": "ClaudioTutoring_100_Limiti_Soluzioni_Dettagliate.pdf",
   "basi-e-sottospazi-vettoriali":
     "ClaudioTutoring_20_Esercizi_Basi_Sottospazi_Vettoriali.pdf",
