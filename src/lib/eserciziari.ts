@@ -8,6 +8,7 @@ export const ESERCIZIARI_CATEGORIES = [
   { id: "analisi-1", label: "Analisi 1" },
   { id: "analisi-2", label: "Analisi 2" },
   { id: "algebra-lineare", label: "Algebra Lineare" },
+  { id: "elettrotecnica", label: "Elettrotecnica" },
   { id: "fisica", label: "Fisica" },
   { id: "altro", label: "Altro" },
 ] as const;
@@ -77,6 +78,48 @@ function pdfPreviewPages(
 }
 
 export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
+  {
+    slug: "metodo-dei-nodi",
+    title: "Metodo dei Nodi",
+    category: "elettrotecnica",
+    subjectLabel: "Elettrotecnica",
+    exerciseCount: 15,
+    difficulty: "Crescente",
+    format: "PDF",
+    priceEuro: 5.9,
+    status: "live",
+    shortDescription:
+      "15 esercizi: generatori, supernodi, leggi di Kirchhoff e soluzioni passo dopo passo.",
+    description:
+      "Una raccolta di 15 esercizi a difficoltà crescente sul metodo dei nodi: circuiti resistivi, generatori ideali, supernodi e regime sinusoidale, senza Laplace né equazioni differenziali. Tracce e svolgimenti separati, pensati per l'esame di Elettrotecnica.",
+    topics: [
+      "Metodo dei nodi",
+      "Generatori ideali di tensione e corrente",
+      "Supernodi",
+      "Leggi di Kirchhoff",
+      "Circuiti in regime sinusoidale",
+    ],
+    includes: [
+      "15 esercizi a difficoltà crescente",
+      "Soluzioni complete passo dopo passo",
+      "Formato PDF scaricabile dopo l'acquisto",
+      "Ideale per ripasso e preparazione all'esame di Elettrotecnica",
+    ],
+    coverAccent: "#0E7490",
+    coverLabel: "ET",
+    coverImage: "/images/cover-metodo-dei-nodi.jpg",
+    privatePdfKey: "ClaudioTutoring_15_Esercizi_Metodo_dei_Nodi.pdf",
+    previewAvailable: true,
+    bookPreview: [
+      {
+        kind: "cover",
+        src: "/images/cover-metodo-dei-nodi.jpg",
+        label: "Copertina",
+      },
+      ...pdfPreviewPages("metodo-dei-nodi", 28),
+      { kind: "cta" },
+    ],
+  },
   {
     slug: "massimi-e-minimi-vincolati",
     title: "Massimi e Minimi Vincolati",
