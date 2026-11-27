@@ -11,11 +11,9 @@ import {
 import { BookPreview } from "./eserciziari/BookPreview";
 import { Reveal } from "./Reveal";
 
-const GAP_PX = 28;
-
 /**
  * Homepage — scaffale orizzontale di copertine.
- * Copertine in primo piano (non card da recensioni): scorri come uno scaffale di PDF.
+ * Copertine centrate + frecce grandi ai lati per scorrere facilmente.
  */
 export function EserciziariPreview() {
   const products = ESERCIZIARI_PRODUCTS;
@@ -26,6 +24,16 @@ export function EserciziariPreview() {
     null,
   );
   const scrollerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const items = el.querySelectorAll<HTMLElement>("[data-shelf-cover]");
+    const item = items[index];
+    if (!item) return;
+    const left = item.offsetLeft - (el.clientWidth - item.offsetWidth) / 2;
+    el.scrollTo({ left: Math.max(0, left), behavior });
+  }, []);
 
   const updateScrollState = useCallback(() => {
     const el = scrollerRef.current;
@@ -53,21 +61,27 @@ export function EserciziariPreview() {
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
-    updateScrollState();
+
+    // Prima copertina centrata all'apertura
+    requestAnimationFrame(() => {
+      scrollToIndex(0, "auto");
+      updateScrollState();
+    });
+
     el.addEventListener("scroll", updateScrollState, { passive: true });
     window.addEventListener("resize", updateScrollState);
     return () => {
       el.removeEventListener("scroll", updateScrollState);
       window.removeEventListener("resize", updateScrollState);
     };
-  }, [updateScrollState, products.length]);
+  }, [scrollToIndex, updateScrollState, products.length]);
 
   function scrollByCover(direction: -1 | 1) {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const cover = el.querySelector<HTMLElement>("[data-shelf-cover]");
-    const step = cover ? cover.offsetWidth + GAP_PX : 280;
-    el.scrollBy({ left: direction * step, behavior: "smooth" });
+    const next = Math.min(
+      products.length - 1,
+      Math.max(0, activeIndex + direction),
+    );
+    scrollToIndex(next);
   }
 
   return (
@@ -86,43 +100,73 @@ export function EserciziariPreview() {
 
       <div className="container-page relative">
         <Reveal>
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-xl">
-              <p className="eyebrow">Eserciziari</p>
-              <h2 className="mt-3 font-display text-3xl text-navy sm:text-4xl">
-                Eserciziari pensati sugli esercizi d&apos;esame
-              </h2>
-              <p className="mt-4 text-base leading-relaxed text-slate sm:text-lg">
-                Materiale d&apos;esame difficile da trovare online, più varianti sugli argomenti
-                più richiesti. Scorri lo scaffale e apri un&apos;anteprima.
-              </p>
-            </div>
-            <p className="shrink-0 text-sm font-medium tabular-nums text-slate sm:pb-1">
-              {products.length} raccolte · scorri →
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow">Eserciziari</p>
+            <h2 className="mt-3 font-display text-3xl text-navy sm:text-4xl">
+              Eserciziari pensati sugli esercizi d&apos;esame
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-slate sm:text-lg">
+              Materiale d&apos;esame difficile da trovare online, più varianti sugli argomenti
+              più richiesti. Scorri lo scaffale e apri un&apos;anteprima.
             </p>
           </div>
         </Reveal>
       </div>
 
-      {/* Scaffale */}
+      {/* Scaffale + frecce laterali */}
       <div className="relative mt-12">
+        <button
+          type="button"
+          onClick={() => scrollByCover(-1)}
+          disabled={!canPrev}
+          className="absolute left-2 top-[38%] z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white text-navy shadow-[0_10px_28px_rgba(16,27,54,0.14)] transition hover:scale-105 hover:border-navy/20 hover:bg-white disabled:pointer-events-none disabled:opacity-0 sm:left-4 sm:h-14 sm:w-14 md:left-6"
+          aria-label="Copertina precedente"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M15 6l-6 6 6 6"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => scrollByCover(1)}
+          disabled={!canNext}
+          className="absolute right-2 top-[38%] z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white text-navy shadow-[0_10px_28px_rgba(16,27,54,0.14)] transition hover:scale-105 hover:border-navy/20 hover:bg-white disabled:pointer-events-none disabled:opacity-0 sm:right-4 sm:h-14 sm:w-14 md:right-6"
+          aria-label="Copertina successiva"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M9 6l6 6-6 6"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
         <div
-          className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-ivory via-ivory/80 to-transparent transition-opacity sm:w-20 ${
-            canPrev ? "opacity-100" : "opacity-0"
+          className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-ivory via-ivory/70 to-transparent sm:w-24 ${
+            canPrev ? "opacity-100" : "opacity-40"
           }`}
           aria-hidden
         />
         <div
-          className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-ivory via-ivory/80 to-transparent transition-opacity sm:w-20 ${
-            canNext ? "opacity-100" : "opacity-0"
+          className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-ivory via-ivory/70 to-transparent sm:w-24 ${
+            canNext ? "opacity-100" : "opacity-40"
           }`}
           aria-hidden
         />
 
         <div
           ref={scrollerRef}
-          className="flex snap-x snap-mandatory items-end gap-7 overflow-x-auto scroll-smooth px-[max(1rem,calc((100%-1120px)/2+1rem))] pb-2 pt-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-8 md:px-[max(1.5rem,calc((100%-1120px)/2+1.5rem))]"
-          style={{ scrollPaddingInline: "max(1rem, calc((100% - 1120px) / 2 + 1rem))" }}
+          className="flex snap-x snap-mandatory items-end gap-7 overflow-x-auto scroll-smooth px-[max(1rem,calc(50%-7.75rem))] pb-2 pt-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 sm:px-[max(1.5rem,calc(50%-8.75rem))] md:px-[max(1.5rem,calc(50%-9.25rem))]"
+          style={{ scrollPaddingInline: "max(1rem, calc(50% - 7.75rem))" }}
         >
           {products.map((product, i) => (
             <ShelfCover
@@ -134,7 +178,6 @@ export function EserciziariPreview() {
           ))}
         </div>
 
-        {/* Linea scaffale */}
         <div
           className="pointer-events-none mx-auto mt-0 h-px max-w-[1120px] bg-gradient-to-r from-transparent via-navy/15 to-transparent"
           aria-hidden
@@ -145,60 +188,16 @@ export function EserciziariPreview() {
         />
       </div>
 
-      <div className="container-page relative mt-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <button
-            type="button"
-            onClick={() => scrollByCover(-1)}
-            disabled={!canPrev}
-            className="group inline-flex items-center gap-2 text-sm font-semibold text-navy transition hover:text-blue disabled:pointer-events-none disabled:opacity-30"
-            aria-label="Copertine precedenti"
-          >
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-navy/12 bg-white/80 transition group-hover:border-blue/30 group-hover:bg-white">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path
-                  d="M15 6l-6 6 6 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-            Indietro
-          </button>
-
-          <p className="order-first w-full text-center text-xs font-semibold uppercase tracking-[0.16em] text-slate sm:order-none sm:w-auto">
-            <span className="tabular-nums text-navy">
-              {String(activeIndex + 1).padStart(2, "0")}
-            </span>
-            <span className="mx-2 text-navy/25">/</span>
-            <span className="tabular-nums">
-              {String(products.length).padStart(2, "0")}
-            </span>
-          </p>
-
-          <button
-            type="button"
-            onClick={() => scrollByCover(1)}
-            disabled={!canNext}
-            className="group inline-flex items-center gap-2 text-sm font-semibold text-navy transition hover:text-blue disabled:pointer-events-none disabled:opacity-30"
-            aria-label="Copertine successive"
-          >
-            Avanti
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-navy/12 bg-white/80 transition group-hover:border-blue/30 group-hover:bg-white">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path
-                  d="M9 6l6 6-6 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-          </button>
-        </div>
+      <div className="container-page relative mt-6">
+        <p className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-slate">
+          <span className="tabular-nums text-navy">
+            {String(activeIndex + 1).padStart(2, "0")}
+          </span>
+          <span className="mx-2 text-navy/25">/</span>
+          <span className="tabular-nums">
+            {String(products.length).padStart(2, "0")}
+          </span>
+        </p>
 
         <Reveal delayMs={100}>
           <div className="mt-10 flex justify-center">
@@ -237,7 +236,7 @@ function ShelfCover({
   return (
     <article
       data-shelf-cover
-      className="group w-[min(72vw,15.5rem)] shrink-0 snap-start sm:w-[17.5rem] md:w-[18.5rem]"
+      className="group w-[min(72vw,15.5rem)] shrink-0 snap-center sm:w-[17.5rem] md:w-[18.5rem]"
       style={{ animationDelay: `${Math.min(index, 6) * 40}ms` }}
     >
       <button
@@ -253,7 +252,6 @@ function ShelfCover({
               "0 18px 40px -14px rgba(16,27,54,0.35), 4px 0 0 0 rgba(16,27,54,0.12), 0 0 0 1px rgba(16,27,54,0.06)",
           }}
         >
-          {/* Dorso libro (lato sinistro) */}
           <span
             className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-[3%] bg-gradient-to-r from-black/35 via-black/10 to-transparent"
             aria-hidden
@@ -286,7 +284,7 @@ function ShelfCover({
         </div>
       </button>
 
-      <div className="mt-4 px-0.5">
+      <div className="mt-4 px-0.5 text-center">
         <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-blue">
           {product.subjectLabel}
         </p>
