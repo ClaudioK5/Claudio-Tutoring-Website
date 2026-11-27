@@ -26,38 +26,22 @@ export function EserciziariPreview() {
   const [fitsAll, setFitsAll] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
-  const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const items = el.querySelectorAll<HTMLElement>("[data-shelf-cover]");
-    const item = items[index];
-    if (!item) return;
-    // Porta la copertina in vista, allineata all'inizio dello scaffale (non a metà viewport)
-    const styles = getComputedStyle(el);
-    const padLeft = parseFloat(styles.paddingLeft) || 0;
-    el.scrollTo({
-      left: Math.max(0, item.offsetLeft - padLeft),
-      behavior,
-    });
-  }, []);
-
   const updateScrollState = useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
+    const max = Math.max(0, el.scrollWidth - el.clientWidth);
     const fits = max <= 2;
     setFitsAll(fits);
-    setCanPrev(!fits && el.scrollLeft > 8);
-    setCanNext(!fits && el.scrollLeft < max - 8);
+    setCanPrev(!fits && el.scrollLeft > 4);
+    setCanNext(!fits && el.scrollLeft < max - 4);
 
     const items = el.querySelectorAll<HTMLElement>("[data-shelf-cover]");
     if (!items.length) return;
-    const mid = el.scrollLeft + el.clientWidth / 2;
+    const anchor = el.scrollLeft + 24;
     let closest = 0;
     let best = Infinity;
     items.forEach((item, i) => {
-      const center = item.offsetLeft + item.offsetWidth / 2;
-      const dist = Math.abs(center - mid);
+      const dist = Math.abs(item.offsetLeft - anchor);
       if (dist < best) {
         best = dist;
         closest = i;
@@ -70,7 +54,6 @@ export function EserciziariPreview() {
     const el = scrollerRef.current;
     if (!el) return;
 
-    // Partenza: scaffale allineato al contenuto della pagina (niente vuoto a sinistra)
     requestAnimationFrame(() => {
       el.scrollLeft = 0;
       updateScrollState();
@@ -85,11 +68,14 @@ export function EserciziariPreview() {
   }, [updateScrollState, products.length]);
 
   function scrollByCover(direction: -1 | 1) {
-    const next = Math.min(
-      products.length - 1,
-      Math.max(0, activeIndex + direction),
-    );
-    scrollToIndex(next);
+    const el = scrollerRef.current;
+    if (!el) return;
+    const cover = el.querySelector<HTMLElement>("[data-shelf-cover]");
+    if (!cover) return;
+    const styles = getComputedStyle(el);
+    const gap = parseFloat(styles.columnGap || styles.gap) || 28;
+    const step = cover.getBoundingClientRect().width + gap;
+    el.scrollBy({ left: direction * step, behavior: "smooth" });
   }
 
   return (
@@ -127,7 +113,7 @@ export function EserciziariPreview() {
           type="button"
           onClick={() => scrollByCover(-1)}
           disabled={!canPrev}
-          className="absolute left-2 top-[38%] z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white text-navy shadow-[0_10px_28px_rgba(16,27,54,0.14)] transition hover:scale-105 hover:border-navy/20 hover:bg-white disabled:pointer-events-none disabled:opacity-0 sm:left-4 sm:h-14 sm:w-14 md:left-6"
+          className="absolute left-2 top-[38%] z-30 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white text-navy shadow-[0_10px_28px_rgba(16,27,54,0.14)] transition hover:scale-105 hover:border-navy/20 hover:bg-white disabled:cursor-default disabled:opacity-35 sm:left-4 sm:h-14 sm:w-14 md:left-6"
           aria-label="Copertina precedente"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -144,7 +130,7 @@ export function EserciziariPreview() {
           type="button"
           onClick={() => scrollByCover(1)}
           disabled={!canNext}
-          className="absolute right-2 top-[38%] z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white text-navy shadow-[0_10px_28px_rgba(16,27,54,0.14)] transition hover:scale-105 hover:border-navy/20 hover:bg-white disabled:pointer-events-none disabled:opacity-0 sm:right-4 sm:h-14 sm:w-14 md:right-6"
+          className="absolute right-2 top-[38%] z-30 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white text-navy shadow-[0_10px_28px_rgba(16,27,54,0.14)] transition hover:scale-105 hover:border-navy/20 hover:bg-white disabled:cursor-default disabled:opacity-35 sm:right-4 sm:h-14 sm:w-14 md:right-6"
           aria-label="Copertina successiva"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
