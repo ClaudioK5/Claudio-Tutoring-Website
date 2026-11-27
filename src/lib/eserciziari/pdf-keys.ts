@@ -3,6 +3,7 @@
  * slug prodotto → nome file esatto su R2.
  */
 export const ESERCIZIARI_R2_KEYS: Record<string, string> = {
+  "metodo-dei-nodi": "ClaudioTutoring_15_Esercizi_Metodo_dei_Nodi.pdf",
   "massimi-e-minimi-vincolati":
     "ClaudioTutoring_35_Massimi_Minimi_Lagrange_Svolgimenti_Completi.pdf",
   "100-limiti": "ClaudioTutoring_100_Limiti_Soluzioni_Dettagliate.pdf",
