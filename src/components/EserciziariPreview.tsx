@@ -100,8 +100,10 @@ export function EserciziariPreview() {
               Eserciziari pensati sugli esercizi d&apos;esame
             </h2>
             <p className="mt-4 text-base leading-relaxed text-slate sm:text-lg">
-              Materiale d&apos;esame difficile da trovare online, più varianti sugli argomenti
-              più richiesti. Scorri lo scaffale e apri un&apos;anteprima.
+              Eserciziari pensati per darti sempre nuovo materiale su cui allenarti: trovi sia
+              esercizi specifici che possono comparire negli esami universitari ma che spesso
+              sono difficili da reperire online, sia numerose nuove varianti sugli argomenti
+              più comuni.
             </p>
           </div>
         </Reveal>
@@ -159,7 +161,7 @@ export function EserciziariPreview() {
 
         <div
           ref={scrollerRef}
-          className={`flex snap-x snap-mandatory items-end gap-7 overflow-x-auto scroll-smooth px-[max(1rem,calc((100%-1120px)/2+1rem))] pb-2 pt-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 md:px-[max(1.5rem,calc((100%-1120px)/2+1.5rem))] ${
+          className={`flex snap-x snap-mandatory items-start gap-7 overflow-x-auto scroll-smooth px-[max(1rem,calc((100%-1120px)/2+1rem))] pb-2 pt-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 md:px-[max(1.5rem,calc((100%-1120px)/2+1.5rem))] ${
             fitsAll ? "justify-center" : ""
           }`}
         >
@@ -279,11 +281,11 @@ function ShelfCover({
         </div>
       </button>
 
-      <div className="mt-4 px-0.5">
+      <div className="mt-4 min-h-[5.5rem] px-0.5">
         <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-blue">
           {product.subjectLabel}
         </p>
-        <h3 className="mt-1.5 font-display text-[1.15rem] leading-[1.2] tracking-tight text-navy sm:text-[1.25rem]">
+        <h3 className="mt-1.5 line-clamp-2 font-display text-[1.15rem] leading-[1.2] tracking-tight text-navy sm:text-[1.25rem]">
           <Link
             href={href}
             className="transition hover:text-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40"
