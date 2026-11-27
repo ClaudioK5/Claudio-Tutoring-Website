@@ -1,22 +1,30 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ESERCIZIARI_PRODUCTS } from "@/lib/eserciziari";
+import {
+  ESERCIZIARI_PRODUCTS,
+  formatProductPrice,
+  type EserciziarioProduct,
+} from "@/lib/eserciziari";
+import { BookPreview } from "./eserciziari/BookPreview";
 import { Reveal } from "./Reveal";
-import { HomePreviewCard } from "./eserciziari/HomePreviewCard";
 
-const GAP_PX = 20;
+const GAP_PX = 28;
 
 /**
- * Homepage eserciziari — carousel orizzontale (come recensioni),
- * così il catalogo può crescere senza allungare tutta la pagina.
+ * Homepage — scaffale orizzontale di copertine.
+ * Copertine in primo piano (non card da recensioni): scorri come uno scaffale di PDF.
  */
 export function EserciziariPreview() {
   const products = ESERCIZIARI_PRODUCTS;
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [previewProduct, setPreviewProduct] = useState<EserciziarioProduct | null>(
+    null,
+  );
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const updateScrollState = useCallback(() => {
@@ -24,15 +32,15 @@ export function EserciziariPreview() {
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
     setCanPrev(el.scrollLeft > 8);
-    setCanNext(el.scrollLeft < max - 8);
+    setCanNext(max > 8 && el.scrollLeft < max - 8);
 
-    const cards = el.querySelectorAll<HTMLElement>("[data-eserciziario-card]");
-    if (!cards.length) return;
+    const items = el.querySelectorAll<HTMLElement>("[data-shelf-cover]");
+    if (!items.length) return;
     const mid = el.scrollLeft + el.clientWidth / 2;
     let closest = 0;
     let best = Infinity;
-    cards.forEach((card, i) => {
-      const center = card.offsetLeft + card.offsetWidth / 2;
+    items.forEach((item, i) => {
+      const center = item.offsetLeft + item.offsetWidth / 2;
       const dist = Math.abs(center - mid);
       if (dist < best) {
         best = dist;
@@ -54,20 +62,12 @@ export function EserciziariPreview() {
     };
   }, [updateScrollState, products.length]);
 
-  function scrollByCard(direction: -1 | 1) {
+  function scrollByCover(direction: -1 | 1) {
     const el = scrollerRef.current;
     if (!el) return;
-    const card = el.querySelector<HTMLElement>("[data-eserciziario-card]");
-    const step = card ? card.offsetWidth + GAP_PX : 340;
+    const cover = el.querySelector<HTMLElement>("[data-shelf-cover]");
+    const step = cover ? cover.offsetWidth + GAP_PX : 280;
     el.scrollBy({ left: direction * step, behavior: "smooth" });
-  }
-
-  function scrollToIndex(index: number) {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const card = el.querySelectorAll<HTMLElement>("[data-eserciziario-card]")[index];
-    if (!card) return;
-    el.scrollTo({ left: card.offsetLeft - 4, behavior: "smooth" });
   }
 
   return (
@@ -76,40 +76,44 @@ export function EserciziariPreview() {
       className="section-pad relative overflow-hidden border-y border-navy/8 bg-ivory"
     >
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.45]"
+        className="pointer-events-none absolute inset-0 opacity-[0.5]"
         style={{
           background:
-            "radial-gradient(ellipse 55% 45% at 10% 0%, rgba(29,63,143,0.06), transparent 55%), radial-gradient(ellipse 40% 35% at 95% 100%, rgba(201,164,92,0.07), transparent 50%)",
+            "radial-gradient(ellipse 50% 40% at 8% 20%, rgba(29,63,143,0.07), transparent 55%), radial-gradient(ellipse 45% 35% at 92% 80%, rgba(11,93,78,0.05), transparent 50%)",
         }}
         aria-hidden
       />
 
       <div className="container-page relative">
         <Reveal>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="eyebrow">Eserciziari</p>
-            <h2 className="mt-3 font-display text-3xl text-navy sm:text-4xl">
-              Eserciziari pensati sugli esercizi d&apos;esame
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-slate sm:text-lg">
-              Eserciziari pensati per darti sempre nuovo materiale su cui allenarti: trovi sia
-              esercizi specifici che possono comparire negli esami universitari ma che spesso
-              sono difficili da reperire online, sia numerose nuove varianti sugli argomenti
-              più comuni.
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-xl">
+              <p className="eyebrow">Eserciziari</p>
+              <h2 className="mt-3 font-display text-3xl text-navy sm:text-4xl">
+                Eserciziari pensati sugli esercizi d&apos;esame
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-slate sm:text-lg">
+                Materiale d&apos;esame difficile da trovare online, più varianti sugli argomenti
+                più richiesti. Scorri lo scaffale e apri un&apos;anteprima.
+              </p>
+            </div>
+            <p className="shrink-0 text-sm font-medium tabular-nums text-slate sm:pb-1">
+              {products.length} raccolte · scorri →
             </p>
           </div>
         </Reveal>
       </div>
 
-      <div className="relative mt-10">
+      {/* Scaffale */}
+      <div className="relative mt-12">
         <div
-          className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-ivory to-transparent transition-opacity sm:w-16 ${
+          className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-ivory via-ivory/80 to-transparent transition-opacity sm:w-20 ${
             canPrev ? "opacity-100" : "opacity-0"
           }`}
           aria-hidden
         />
         <div
-          className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-ivory to-transparent transition-opacity sm:w-16 ${
+          className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-ivory via-ivory/80 to-transparent transition-opacity sm:w-20 ${
             canNext ? "opacity-100" : "opacity-0"
           }`}
           aria-hidden
@@ -117,88 +121,189 @@ export function EserciziariPreview() {
 
         <div
           ref={scrollerRef}
-          className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-[max(1rem,calc((100%-1120px)/2+1rem))] pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:px-[max(1.5rem,calc((100%-1120px)/2+1.5rem))]"
+          className="flex snap-x snap-mandatory items-end gap-7 overflow-x-auto scroll-smooth px-[max(1rem,calc((100%-1120px)/2+1rem))] pb-2 pt-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-8 md:px-[max(1.5rem,calc((100%-1120px)/2+1.5rem))]"
           style={{ scrollPaddingInline: "max(1rem, calc((100% - 1120px) / 2 + 1rem))" }}
         >
-          {products.map((product) => (
-            <div
+          {products.map((product, i) => (
+            <ShelfCover
               key={product.slug}
-              data-eserciziario-card
-              className="w-[min(85vw,19.5rem)] shrink-0 snap-start sm:w-[21rem]"
-            >
-              <HomePreviewCard product={product} />
-            </div>
+              product={product}
+              index={i}
+              onOpenPreview={() => setPreviewProduct(product)}
+            />
           ))}
         </div>
+
+        {/* Linea scaffale */}
+        <div
+          className="pointer-events-none mx-auto mt-0 h-px max-w-[1120px] bg-gradient-to-r from-transparent via-navy/15 to-transparent"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none mx-auto h-3 max-w-[1120px] bg-gradient-to-b from-navy/[0.06] to-transparent"
+          aria-hidden
+        />
       </div>
 
-      <div className="container-page relative mt-6">
-        <div className="flex items-center justify-center gap-4">
+      <div className="container-page relative mt-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <button
             type="button"
-            onClick={() => scrollByCard(-1)}
+            onClick={() => scrollByCover(-1)}
             disabled={!canPrev}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-navy/10 bg-white text-navy shadow-[0_4px_14px_rgba(16,27,54,0.04)] transition hover:border-navy/20 hover:bg-navy/[0.03] disabled:pointer-events-none disabled:opacity-30"
-            aria-label="Eserciziari precedenti"
+            className="group inline-flex items-center gap-2 text-sm font-semibold text-navy transition hover:text-blue disabled:pointer-events-none disabled:opacity-30"
+            aria-label="Copertine precedenti"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M15 6l-6 6 6 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-navy/12 bg-white/80 transition group-hover:border-blue/30 group-hover:bg-white">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M15 6l-6 6 6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            Indietro
           </button>
 
-          <div
-            className="flex max-w-[min(100%,14rem)] flex-wrap items-center justify-center gap-2"
-            role="tablist"
-            aria-label="Navigazione eserciziari"
-          >
-            {products.map((product, i) => (
-              <button
-                key={product.slug}
-                type="button"
-                role="tab"
-                aria-selected={i === activeIndex}
-                aria-label={`Vai a ${product.title}`}
-                onClick={() => scrollToIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === activeIndex ? "w-6 bg-blue" : "w-1.5 bg-navy/15 hover:bg-navy/30"
-                }`}
-              />
-            ))}
-          </div>
+          <p className="order-first w-full text-center text-xs font-semibold uppercase tracking-[0.16em] text-slate sm:order-none sm:w-auto">
+            <span className="tabular-nums text-navy">
+              {String(activeIndex + 1).padStart(2, "0")}
+            </span>
+            <span className="mx-2 text-navy/25">/</span>
+            <span className="tabular-nums">
+              {String(products.length).padStart(2, "0")}
+            </span>
+          </p>
 
           <button
             type="button"
-            onClick={() => scrollByCard(1)}
+            onClick={() => scrollByCover(1)}
             disabled={!canNext}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-navy/10 bg-white text-navy shadow-[0_4px_14px_rgba(16,27,54,0.04)] transition hover:border-navy/20 hover:bg-navy/[0.03] disabled:pointer-events-none disabled:opacity-30"
-            aria-label="Eserciziari successivi"
+            className="group inline-flex items-center gap-2 text-sm font-semibold text-navy transition hover:text-blue disabled:pointer-events-none disabled:opacity-30"
+            aria-label="Copertine successive"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M9 6l6 6-6 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            Avanti
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-navy/12 bg-white/80 transition group-hover:border-blue/30 group-hover:bg-white">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M9 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
           </button>
         </div>
 
-        <Reveal delayMs={120}>
+        <Reveal delayMs={100}>
           <div className="mt-10 flex justify-center">
             <Link href="/eserciziari" className="btn-primary">
-              Scopri gli eserciziari
+              Vedi tutto il catalogo
             </Link>
           </div>
         </Reveal>
       </div>
+
+      {previewProduct && (
+        <BookPreview
+          product={previewProduct}
+          mode="overlay"
+          open={Boolean(previewProduct)}
+          onOpenChange={(open) => {
+            if (!open) setPreviewProduct(null);
+          }}
+        />
+      )}
     </section>
+  );
+}
+
+function ShelfCover({
+  product,
+  index,
+  onOpenPreview,
+}: {
+  product: EserciziarioProduct;
+  index: number;
+  onOpenPreview: () => void;
+}) {
+  const href = `/eserciziari/${product.slug}`;
+
+  return (
+    <article
+      data-shelf-cover
+      className="group w-[min(72vw,15.5rem)] shrink-0 snap-start sm:w-[17.5rem] md:w-[18.5rem]"
+      style={{ animationDelay: `${Math.min(index, 6) * 40}ms` }}
+    >
+      <button
+        type="button"
+        onClick={onOpenPreview}
+        className="relative block w-full text-left outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
+        aria-label={`Apri anteprima di ${product.title}`}
+      >
+        <div
+          className="relative aspect-[3/4] overflow-hidden rounded-[0.65rem] bg-navy transition duration-500 ease-out group-hover:-translate-y-2 group-hover:shadow-[0_28px_50px_-12px_rgba(16,27,54,0.45)]"
+          style={{
+            boxShadow:
+              "0 18px 40px -14px rgba(16,27,54,0.35), 4px 0 0 0 rgba(16,27,54,0.12), 0 0 0 1px rgba(16,27,54,0.06)",
+          }}
+        >
+          {/* Dorso libro (lato sinistro) */}
+          <span
+            className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-[3%] bg-gradient-to-r from-black/35 via-black/10 to-transparent"
+            aria-hidden
+          />
+          {product.coverImage ? (
+            <Image
+              src={product.coverImage}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 72vw, 296px"
+              className="object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
+            />
+          ) : (
+            <div
+              className="absolute inset-0 flex flex-col justify-between p-5 text-white"
+              style={{
+                background: `linear-gradient(165deg, ${product.coverAccent} 0%, #101B36 78%)`,
+              }}
+              aria-hidden
+            >
+              <p className="font-display text-lg leading-tight">{product.title}</p>
+              <span className="text-xs text-white/70">{product.subjectLabel}</span>
+            </div>
+          )}
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] bg-gradient-to-t from-navy/80 via-navy/20 to-transparent px-3 pb-3 pt-10 opacity-0 transition duration-300 group-hover:opacity-100">
+            <span className="block text-center text-[0.7rem] font-bold uppercase tracking-[0.14em] text-white">
+              Sfoglia anteprima
+            </span>
+          </span>
+        </div>
+      </button>
+
+      <div className="mt-4 px-0.5">
+        <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-blue">
+          {product.subjectLabel}
+        </p>
+        <h3 className="mt-1.5 font-display text-[1.15rem] leading-[1.2] tracking-tight text-navy sm:text-[1.25rem]">
+          <Link
+            href={href}
+            className="transition hover:text-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40"
+          >
+            {product.title}
+          </Link>
+        </h3>
+        <p className="mt-2 text-sm text-slate">
+          {product.exerciseCount} esercizi
+          <span className="mx-1.5 text-navy/20">·</span>
+          {formatProductPrice(product.priceEuro)}
+        </p>
+      </div>
+    </article>
   );
 }
