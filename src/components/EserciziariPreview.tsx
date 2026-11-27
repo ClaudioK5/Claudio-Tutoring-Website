@@ -23,6 +23,7 @@ export function EserciziariPreview() {
   const [previewProduct, setPreviewProduct] = useState<EserciziarioProduct | null>(
     null,
   );
+  const [fitsAll, setFitsAll] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
@@ -31,16 +32,23 @@ export function EserciziariPreview() {
     const items = el.querySelectorAll<HTMLElement>("[data-shelf-cover]");
     const item = items[index];
     if (!item) return;
-    const left = item.offsetLeft - (el.clientWidth - item.offsetWidth) / 2;
-    el.scrollTo({ left: Math.max(0, left), behavior });
+    // Porta la copertina in vista, allineata all'inizio dello scaffale (non a metà viewport)
+    const styles = getComputedStyle(el);
+    const padLeft = parseFloat(styles.paddingLeft) || 0;
+    el.scrollTo({
+      left: Math.max(0, item.offsetLeft - padLeft),
+      behavior,
+    });
   }, []);
 
   const updateScrollState = useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
-    setCanPrev(el.scrollLeft > 8);
-    setCanNext(max > 8 && el.scrollLeft < max - 8);
+    const fits = max <= 2;
+    setFitsAll(fits);
+    setCanPrev(!fits && el.scrollLeft > 8);
+    setCanNext(!fits && el.scrollLeft < max - 8);
 
     const items = el.querySelectorAll<HTMLElement>("[data-shelf-cover]");
     if (!items.length) return;
@@ -62,9 +70,9 @@ export function EserciziariPreview() {
     const el = scrollerRef.current;
     if (!el) return;
 
-    // Prima copertina centrata all'apertura
+    // Partenza: scaffale allineato al contenuto della pagina (niente vuoto a sinistra)
     requestAnimationFrame(() => {
-      scrollToIndex(0, "auto");
+      el.scrollLeft = 0;
       updateScrollState();
     });
 
@@ -74,7 +82,7 @@ export function EserciziariPreview() {
       el.removeEventListener("scroll", updateScrollState);
       window.removeEventListener("resize", updateScrollState);
     };
-  }, [scrollToIndex, updateScrollState, products.length]);
+  }, [updateScrollState, products.length]);
 
   function scrollByCover(direction: -1 | 1) {
     const next = Math.min(
@@ -165,8 +173,9 @@ export function EserciziariPreview() {
 
         <div
           ref={scrollerRef}
-          className="flex snap-x snap-mandatory items-end gap-7 overflow-x-auto scroll-smooth px-[max(1rem,calc(50%-7.75rem))] pb-2 pt-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 sm:px-[max(1.5rem,calc(50%-8.75rem))] md:px-[max(1.5rem,calc(50%-9.25rem))]"
-          style={{ scrollPaddingInline: "max(1rem, calc(50% - 7.75rem))" }}
+          className={`flex snap-x snap-mandatory items-end gap-7 overflow-x-auto scroll-smooth px-[max(1rem,calc((100%-1120px)/2+1rem))] pb-2 pt-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 md:px-[max(1.5rem,calc((100%-1120px)/2+1.5rem))] ${
+            fitsAll ? "justify-center" : ""
+          }`}
         >
           {products.map((product, i) => (
             <ShelfCover
@@ -236,7 +245,7 @@ function ShelfCover({
   return (
     <article
       data-shelf-cover
-      className="group w-[min(72vw,15.5rem)] shrink-0 snap-center sm:w-[17.5rem] md:w-[18.5rem]"
+      className="group w-[min(72vw,15.5rem)] shrink-0 snap-start sm:w-[17.5rem] md:w-[18.5rem]"
       style={{ animationDelay: `${Math.min(index, 6) * 40}ms` }}
     >
       <button
@@ -284,7 +293,7 @@ function ShelfCover({
         </div>
       </button>
 
-      <div className="mt-4 px-0.5 text-center">
+      <div className="mt-4 px-0.5">
         <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-blue">
           {product.subjectLabel}
         </p>
