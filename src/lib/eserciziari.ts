@@ -79,6 +79,48 @@ function pdfPreviewPages(
 
 export const ESERCIZIARI_PRODUCTS: readonly EserciziarioProduct[] = [
   {
+    slug: "equazioni-differenziali",
+    title: "Equazioni Differenziali",
+    category: "analisi-2",
+    subjectLabel: "Analisi 2",
+    exerciseCount: 25,
+    difficulty: "Crescente",
+    format: "PDF",
+    priceEuro: 5.9,
+    status: "live",
+    shortDescription:
+      "25 esercizi: variabili separabili, lineari del primo e secondo ordine, Cauchy.",
+    description:
+      "Una raccolta di 25 esercizi a difficoltà crescente sulle equazioni differenziali ordinarie: variabili separabili, equazioni lineari del primo ordine, lineari del secondo ordine omogenee e non omogenee, problemi di Cauchy. Tracce e svolgimenti separati, pensati per l'esame di Analisi Matematica II.",
+    topics: [
+      "Variabili separabili",
+      "Equazioni lineari del primo ordine",
+      "Equazioni lineari del secondo ordine",
+      "Problemi di Cauchy",
+      "Esercizi in stile esame di Analisi 2",
+    ],
+    includes: [
+      "25 esercizi a difficoltà crescente",
+      "Soluzioni complete passo dopo passo",
+      "Formato PDF scaricabile dopo l'acquisto",
+      "Ideale per ripasso e preparazione all'esame di Analisi 2",
+    ],
+    coverAccent: "#312E81",
+    coverLabel: "A2",
+    coverImage: "/images/cover-equazioni-differenziali.jpg",
+    privatePdfKey: "equazioni_differenziali.pdf",
+    previewAvailable: true,
+    bookPreview: [
+      {
+        kind: "cover",
+        src: "/images/cover-equazioni-differenziali.jpg",
+        label: "Copertina",
+      },
+      ...pdfPreviewPages("equazioni-differenziali", 11),
+      { kind: "cta" },
+    ],
+  },
+  {
     slug: "metodo-dei-nodi",
     title: "Metodo dei Nodi",
     category: "elettrotecnica",
