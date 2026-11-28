@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { BookingButton } from "@/components/BookingButton";
 import { Catalog } from "@/components/eserciziari/Catalog";
 import { ShopChrome } from "@/components/eserciziari/ShopChrome";
@@ -46,7 +47,13 @@ export default function EserciziariPage() {
           </Reveal>
 
           <div className="mt-12">
-            <Catalog />
+            <Suspense
+              fallback={
+                <p className="text-center text-sm text-slate">Caricamento catalogo…</p>
+              }
+            >
+              <Catalog />
+            </Suspense>
           </div>
 
           <Reveal delayMs={100}>
